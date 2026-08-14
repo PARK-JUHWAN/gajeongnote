@@ -1,7 +1,7 @@
 name: gajeongnote
 description: 가정간호노트 — 제도와 근거를 두 가지 언어로 읽는 학습 앱
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ^3.8.0
@@ -13,6 +13,7 @@ dependencies:
   flutter_svg: ^2.0.0
   hive_ce: ^2.0.0
   hive_ce_flutter: ^2.0.0
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_lints: ^5.0.0

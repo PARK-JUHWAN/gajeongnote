@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../design/tokens.dart';
 import '../models/chapter.dart';
 import 'svg_icon.dart';
@@ -41,6 +42,18 @@ class BlockView extends StatelessWidget {
   final Color accent;
   const BlockView(this.block, {super.key, required this.accent});
 
+  Future<void> _openUrl(String urlString) async {
+    if (urlString.isEmpty) return;
+    final uri = Uri.parse(urlString);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      // 링크 열기 실패 시 예외 무시
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     switch (block.type) {
@@ -65,17 +78,65 @@ class BlockView extends StatelessWidget {
           padding: const EdgeInsets.only(top: 18),
           decoration: const BoxDecoration(
               border: Border(top: BorderSide(color: T.g100, width: 1))),
-          child: KText(block.p,
-              style: const TextStyle(
-                  fontFamily: T.ff,
-                  fontSize: 12.5,
-                  height: 1.7,
-                  color: T.g500,
-                  fontWeight: FontWeight.w400)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              KText(block.p,
+                  style: const TextStyle(
+                      fontFamily: T.ff,
+                      fontSize: 12.5,
+                      height: 1.7,
+                      color: T.g500,
+                      fontWeight: FontWeight.w400)),
+              if (block.links != null && block.links!.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final link in block.links!)
+                      GestureDetector(
+                        onTap: () => _openUrl(link.url),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: T.g50,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: T.g200, width: 0.8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                link.label,
+                                style: const TextStyle(
+                                  fontFamily: T.ff,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: T.g700,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Text(
+                                '↗',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: T.g500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ],
+          ),
         );
 
       case BlockType.notice:
-
         return Container(
           margin: const EdgeInsets.only(top: 8, bottom: 18),
           padding: const EdgeInsets.all(18),

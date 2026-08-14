@@ -9,6 +9,18 @@ BlockType _bt(String? s) => switch (s) {
       _ => BlockType.p,
     };
 
+class LinkItem {
+  final String label;
+  final String url;
+
+  const LinkItem({required this.label, required this.url});
+
+  factory LinkItem.fromJson(Map<String, dynamic> j) => LinkItem(
+        label: (j['label'] ?? '') as String,
+        url: (j['url'] ?? '') as String,
+      );
+}
+
 class Block {
   final BlockType type;
 
@@ -16,12 +28,24 @@ class Block {
 
   final String p;
 
-  const Block({required this.type, this.h, required this.p});
+  final List<LinkItem>? links;
+
+  const Block({
+    required this.type,
+    this.h,
+    required this.p,
+    this.links,
+  });
 
   factory Block.fromJson(Map<String, dynamic> j) => Block(
         type: _bt(j['type'] as String?),
         h: j['h'] as String?,
         p: (j['p'] ?? '') as String,
+        links: j['links'] != null
+            ? ((j['links'] as List)
+                .map((e) => LinkItem.fromJson(e as Map<String, dynamic>))
+                .toList())
+            : null,
       );
 }
 
